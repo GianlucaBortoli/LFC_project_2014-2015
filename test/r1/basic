@@ -21,5 +21,4 @@ main{
 	else{
 		printInt 4;
 	}
-
 }
