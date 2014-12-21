@@ -75,14 +75,14 @@
                             char * tmp = (char *)malloc(strlen(yytext)+1);
                             strcpy(tmp, yytext);
 
-                            char * char = tmp; 
+                            char * ch = tmp; 
                             // find the comma inside the string
-                            for (int i = 0; char[i] != ','; i++){
-                            	if(char[i] == ','){
+                            for (int i = 0; ch[i] != ','; i++){
+                            	if(ch[i] == ','){
                             		// comma is in there for sure when I match this regexp
                             		// so when I find it, I replace it with the dot to use internal
                             		// c rappresentation for float numpers
-                            		char[i] = '.'; 
+                            		ch[i] = '.'; 
                             	}
                           	}
                             yylval.rValue = atof(tmp);

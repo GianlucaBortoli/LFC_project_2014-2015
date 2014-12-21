@@ -28,13 +28,12 @@ ret * ex(nodeType *p) {
         }
 
         case nodeCon: {
-            ret * r = malloc(sizeof(ret));
-            memcpy(r, &(p->con), sizeof(ret));
-            return r;
+        	// return directly the constant node of p
+            return &(p->con);
         }
 
         case nodeId: {
-        	//check if a certain id is already declared
+        	//check if an id with such name is already declared
             symrec * s = getsym(p->id.name);
             if(s == NULL){
                 fprintf(stdout, "%s variable does not exist\n", p->id.name);
@@ -60,86 +59,78 @@ ret * ex(nodeType *p) {
         }
 
         case nodeOpr: {
-            // Used for expr
-            mappable f = NULL;
-            ret * a = NULL , * b = NULL;
-            int flag = 0;
-
             switch(p->opr.oper) {
-                case WHILE:
-                    while(coercion(ex(p->opr.op[0]), BOOLTYPE)->b)
+                case WHILE: {
+                    while((*ex(p->opr.op[0])).b)
                         ex(p->opr.op[1]);
                     return 0;
+                }
 
-                case FOR: {
-                    /*
-                    * 0: var
-                    * 1: initial value
-                    * 2: upper boundary
-                    * 3: body
-                    */
-                    ret * c;
+                case FOR: { 
+                	symrec * s = getsym(p->opr.op[0]->id.name);
+                	s->value = ex(p->opr.op[1]);
 
-                    ex(opr(EQ, 2, p->opr.op[0], p->opr.op[1]));
-                    // iterator < boundary
-                    while(coercion(ex(opr(LT, 2, p->opr.op[0], p->opr.op[2])), BOOLTYPE)->b) {
-                        // exec
+                	while(s->value - ex(p->opr.op[2])){
                         ex(p->opr.op[3]);
-
-                        // Please use singleton for con too
-                        ex(opr(EQ, 2,
-                            p->opr.op[0],
-                            con(&(*ex(opr(PLUS, 2,
-                                p->opr.op[0],
-                                ONE()))).i,
-                                INTTYPE
-                            )
-                        ));
+                        s->value++;
                     }
-
                     return 0;
                 }
 
                 case IF: {
-                    if(coercion(ex(p->opr.op[0]), BOOLTYPE)->b)
-                        ex(p->opr.op[1]); // IF
-                    else if (p->opr.nops > 2)
-                        ex(p->opr.op[2]); // ELSE (if any)
+                	if (ex(p->opr.op[0])){                  
+                        ex(p->opr.op[1]);
+                    }
+                    else if (p->opr.nops > 2) {
+                        ex(p->opr.op[2]);
+                    }
                     return 0;
                 }
 
-                case PRINTINT:
-                case PRINTREAL:
-                case PRINTBOOL:
-
+                case PRINTINT: {
+                	ret * print = ex(p->opr.op[0]);
+                    if (print->type != INTTYPE) {
+                        yyerror("The function printInt can print only integers.");
+                    }
+                    return 0;
+                    printf("%d\n", print->i);
+                }
+                case PRINTREAL: {
+                	ret * print = ex(p->opr.op[0]);
+                    if (print->type != REALTYPE) {
+                        yyerror("The function printFloat can print only float.");
+                    }
+                    return 0;
+                    printf("%f\n", print->r);
+                }
+                case PRINTBOOL: {
+                	ret * print = ex(p->opr.op[0]);
+                    if (print->type != BOOLTYPE) {
+                        yyerror("The function printInt can print only booleans.");
+                    }
+                    return 0;
+                    printf("%d\n", print->b);
+                }
                 case PRINT: {
-                    int cmd = p->opr.oper;
-                    ret * to_print = ex(p->opr.op[0]);
+                    ret * print = ex(p->opr.op[0]);
 
-                    switch(to_print->type){
-                        case INTTYPE:
-                            if (cmd != PRINT && cmd != PRINTINT) yyerror("Type error.");
-                            printf("%d\n", to_print->i);
+                    switch(print->type){
+                        case INTTYPE
+                            printf("%d\n", print->i);
                             break;
                         case REALTYPE:
-                            if (cmd != PRINT && cmd != PRINTREAL) yyerror("Type error.");
-                            {
-                                char * fstr = (char*)xmalloc(46 + 1); // len(print(FLT_MAX);
-                                sprintf(fstr, "%f", to_print->r);
-
-                                // substitute comma with dot
-                                char * c = fstr;
-                                for(; *c != '.'; c++);
-                                *c = ',';
-                                printf("%s\n", fstr);
-
-                                free(fstr);
+                        	char * tmp = (char*)malloc(46 + 1); // len(print(FLT_MAX);
+                            sprintf(tmp, "%f", to_print->r);
+                            // substitute comma with dot, again
+                            char * ch = tmp;
+                            for(int i = 0; ch[i] != '.'; i++){
+                            	ch[i] = ',';
                             }
+                            printf("%s\n", tmp);
+                            free(tmp);
                             break;
-
                         case BOOLTYPE:
-                            if (cmd != PRINT && cmd != PRINTBOOL) yyerror("Type error.");
-                            if (to_print->b)
+                            if (print->b)
                                 printf("true\n");
                             else
                                 printf("false\n");
@@ -147,8 +138,7 @@ ret * ex(nodeType *p) {
                         default:
                             yyerror("Unrecognized type.");
                     }
-                    return 0;
-                }
+                    return 0; 
 
                 case SEMICOLON:
                     ex(p->opr.op[0]);

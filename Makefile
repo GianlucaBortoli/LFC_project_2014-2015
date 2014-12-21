@@ -4,12 +4,12 @@ LEX = lex
 YACC = yacc -d
 CC = gcc -std=c99
 
-interpreter: y.tab.o lex.yy.o myClac.o execute.o functional.o
-	$(CC) -o interpreter y.tab.o lex.yy.o myClac.o execute.o functional.o -ll -lm
+interpreter: y.tab.o lex.yy.o myClac.o calcInterpreter.o functional.o
+	$(CC) -o interpreter y.tab.o lex.yy.o myClac.o calcInterpreter.o functional.o -ll -lm
 
 myClac.o: myClac.c
 
-execute.o: execute.c
+calcInterpreter.o: calcInterpreter.c
 
 functional.o: functional.c
 
