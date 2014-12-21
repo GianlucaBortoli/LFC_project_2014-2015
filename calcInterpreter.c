@@ -86,7 +86,11 @@ ret * ex(nodeType *p) {
                     }
                     return 0;
                 }
-
+                /*
+				* The print function is already polymorphic: printInt e printBool
+				* is a sort of workaround in order to pass early tests.
+				* I implemented the java-style print before writing printInt e printFloat
+                */
                 case PRINTINT: {
                 	ret * print = ex(p->opr.op[0]);
                     if (print->type != INTTYPE) {
@@ -95,6 +99,7 @@ ret * ex(nodeType *p) {
                     return 0;
                     printf("%d\n", print->i);
                 }
+
                 case PRINTREAL: {
                 	ret * print = ex(p->opr.op[0]);
                     if (print->type != REALTYPE) {
@@ -103,23 +108,19 @@ ret * ex(nodeType *p) {
                     return 0;
                     printf("%f\n", print->r);
                 }
-                case PRINTBOOL: {
-                	ret * print = ex(p->opr.op[0]);
-                    if (print->type != BOOLTYPE) {
-                        yyerror("The function printInt can print only booleans.");
-                    }
-                    return 0;
-                    printf("%d\n", print->b);
-                }
-                case PRINT: {
-                    ret * print = ex(p->opr.op[0]);
 
+                case PRINT: {
+                	// I already do type checking in the print function
+                	// switch over types in order to print in the right way the value
+                    ret * print = ex(p->opr.op[0]);
                     switch(print->type){
                         case INTTYPE
                             printf("%d\n", print->i);
                             break;
                         case REALTYPE:
-                        	char * tmp = (char*)malloc(46 + 1); // len(print(FLT_MAX);
+                        	// 46 is the maximum length of float in C
+                       		// I didn't figured out a smart(er) way to do this 
+                        	char * tmp = (char*)malloc(46 + 1);
                             sprintf(tmp, "%f", to_print->r);
                             // substitute comma with dot, again
                             char * ch = tmp;
@@ -136,13 +137,15 @@ ret * ex(nodeType *p) {
                                 printf("false\n");
                             break;
                         default:
-                            yyerror("Unrecognized type.");
+                            yyerror("You tried to print an unauthorized type.");
                     }
                     return 0; 
+                }
 
-                case SEMICOLON:
+                case SEMICOLON: {
                     ex(p->opr.op[0]);
                     return ex(p->opr.op[1]);
+                }
 
                 case EQ: {
                     symrec * s = getsym(p->opr.op[0]->id.name);
@@ -151,97 +154,137 @@ ret * ex(nodeType *p) {
                         exit(1);
                     }
 
-                    ret * n = ex(p->opr.op[1]);
-
-                    // real = int
-                    if (!coercion_table[s->type][n->type])
-                        yyerror("Incompatible type assignment.");
-
-                    switch (s->type) {
+                    //add here coercion support
+                    ret * val = ex(p->opr.op[1]);
+                    switch (val->type) {
                         case INTTYPE:
-                            switch (n->type) {
-                                case INTTYPE:  s->i = n->i; break;
-                                case REALTYPE: s->i = (int)n->r; break;
-                                case BOOLTYPE: s->i = (int)n->b; break;
-                            }
+                            s->i = val->i;
                             break;
                         case REALTYPE:
-                            switch (n->type) {
-                                case INTTYPE:  s->r = (float)n->i; break;
-                                case REALTYPE: s->r = n->r; break;
-                                case BOOLTYPE: s->r = (float)n->b; break;
-                            }
+                            s->r = val->r;
                             break;
-
                         case BOOLTYPE:
-                            switch (n->type) {
-                                case INTTYPE:  s->b = n->i != 0; break;
-                                case REALTYPE: s->b = n->r != 0; break;
-                                case BOOLTYPE: s->b = n->b; break;
-                            }
+                            s->b = val->b;
                             break;
+                        default:
+                            yyerror("Not allowed type used.");
                     }
-                    return n;
+                    return val;
                 }
 
+                case UMINUS: {
+                	ret * a = ex(p->opr.op[0]);
+                    return apply(&neg, a, NULL, a->type);
+                }
 
-                case UMINUS: f = f != NULL ? f : &neg;
-                case PLUS: f = f != NULL ? f : &sum;
-                case MIN:  f = f != NULL ? f : &mni;
-                case MUL:  f = f != NULL ? f : &mul;
-                case DIV:  f = f != NULL ? f : &dvi;
-                    flag = 3;
+                case PLUS:{
+                    ret * a = ex(p->opr.op[0]);
+                    ret * b = ex(p->opr.op[1]);
 
-                case LT:   f = f != NULL ? f : &lt;
-                case GT:   f = f != NULL ? f : &gt;
-                case GTE:  f = f != NULL ? f : &gte;
-                case LTE:  f = f != NULL ? f : &lte;
-                    flag = max(flag, 2);
+                    varTypeEnum dstType = max(a->type, b->type);
 
-                case NE:  f = f != NULL ? f : &neq;
-                case DEQ: f = f != NULL ? f : &deq;
-                    flag = max(flag, 1);
+                    return apply(&sum, a, b, dstType);
+                }
 
-                case AND: f = f != NULL ? f : &and;
-                case OR:  f = f != NULL ? f : &or;
-                case NOT: f = f != NULL ? f : &not;
-                    flag = max(flag, 0);
-                    {
-                        varTypeEnum
-                            retType = BOOLTYPE,
-                            valType = BOOLTYPE;
+                case MIN:{
+                    ret * a = ex(p->opr.op[0]);
+                    ret * b = ex(p->opr.op[1]);
 
-                        a = ex(p->opr.op[0]);
-                        b = p->opr.nops == 2 ? ex(p->opr.op[1]) : NULL;
+                    varTypeEnum dstType = max(a->type, b->type);
 
-                        switch (flag) {
-                            case 3:
-                                valType = retType = max(b ? max(a->type, b->type) : a->type, INTTYPE);
-                                break;
-                            case 2:
-                                valType = max(b ? max(a->type, b->type) : a->type, INTTYPE);
-                                break;
-                            case 1:
-                                valType = b ? max(a->type, b->type) : a->type;
-                                break;
-                        }
+                    return apply(&min, a, b, dstType);
+                }
 
-                        return apply(
-                            f,
-                            coercion(a, valType),
-                            coercion(b, valType),
-                            retType
-                            );
-                    }
+                case MULT: {
+                    ret * a = ex(p->opr.op[0]);
+                    ret * b = ex(p->opr.op[1]);
+
+                    varTypeEnum dstType = max(a->type, b->type);
+
+                    return apply(&mul, a, b, dstType);
+                }
+
+                case DIV: {
+                    ret * a = ex(p->opr.op[0]);
+                    ret * b = ex(p->opr.op[1]);
+
+                    // TODO: add here type checking
+                    varTypeEnum dstType = max(a->type, b->type);
+
+                    return apply(&dvi, a, b, dstType);
+                }
+
+                case LT: {
+                    ret * a = ex(p->opr.op[0]);
+                    ret * b = ex(p->opr.op[1]);
+
+                    return apply(&lt, a, b, BOOLTYPE);
+                }
+
+                case GT: {
+                    ret * a = ex(p->opr.op[0]);
+                    ret * b = ex(p->opr.op[1]);
+
+                    return apply(&gt, a, b, BOOLTYPE);
+                }
+
+                case GRE:{
+                    ret * a = ex(p->opr.op[0]);
+                    ret * b = ex(p->opr.op[1]);
+
+                    return apply(&gte, a, b, BOOLTYPE);
+                }
+
+                case LRE: {
+                    ret * a = ex(p->opr.op[0]);
+                    ret * b = ex(p->opr.op[1]);
+
+                    return apply(&lte, a, b, BOOLTYPE);
+                }
+
+                case NE: {
+                    ret * a = ex(p->opr.op[0]);
+                    ret * b = ex(p->opr.op[1]);
+
+                    varTypeEnum dstType = max(a->type, b->type);
+
+                    return apply(&neq, a, b, BOOLTYPE);
+                }
+
+                case DBQ: {
+                    ret * a = ex(p->opr.op[0]);
+                    ret * b = ex(p->opr.op[1]);
+
+                    return apply(&deq, a, b, BOOLTYPE);
+                }
+
+                case AND: {
+                    ret* a = ex(p->opr.op[0]);
+                    ret* b = ex(p->opr.op[1]);
+
+                    return apply(&and, a, b, BOOLTYPE);
+                }
+
+                case OR: {
+                    ret* a = ex(p->opr.op[0]);
+                    ret* b = ex(p->opr.op[1]);
+
+                    return apply(&or, a, b, BOOLTYPE);
+                }
+
+                case NOT:{
+                    ret* a = ex(p->opr.op[0]);
+                    return apply(&not, a, NULL, BOOLTYPE);
+                }
+
                 default:
-                    yyerror("Operator not matched.");
+                	yyerror("Operator not recognized.");
             }
-            break;
-        }
-    default:
-        yyerror("Node was not matched\n");
-    }
+       		break;
 
-    yyerror("[WTF] This should be DEAD CODE.");
-    return 0;
+        default:
+        	yyerror("Node can not be matched");
+        }
+    yyerror("Error!");
+    exit(1);
 }
