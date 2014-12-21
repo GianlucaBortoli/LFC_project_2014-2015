@@ -3,14 +3,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include "myCalc.h"
 
 /*
 * Error messages, program exits when called. 
 * No need to call exit every time
 */
-void yyerror(char * m){
-	fprontf(stout, "%s", m);
+void yyerror(const char * m){
+	fprintf(stdout, "%s", m);
 	exit(1);
 }
 
@@ -33,7 +34,7 @@ nodeType * opr(int oper, int nops, ...){
         yyerror("out of memory");
     }
 
-    p->type = typeOpr;
+    p->type = nodeOpr;
     p->opr.oper = oper;
     p->opr.nops = nops;
     va_start(ap, nops);
@@ -49,7 +50,7 @@ nodeType * opr(int oper, int nops, ...){
 * need type as parameter in order to set 
 * the proper conNodeType field of union
 */
-nodeType * con(void * val, varEnum type){
+nodeType * con(float val, varEnum type){
 	nodeType *p = (nodeType*)malloc(sizeof(nodeType));
 	if ((p = malloc(sizeof(nodeType))) == NULL){
         yyerror("out of memory");
@@ -60,13 +61,13 @@ nodeType * con(void * val, varEnum type){
     // set right field
     switch (type) {
         case INTTYPE:
-            p->con.i = *(int*)value;
+            p->con.i = (int)val;
             break;
         case REALTYPE:
-            p->con.r = *(float*)value;
+            p->con.r = (float)val;
             break;
         case BOOLTYPE:
-               p->con.b = *(int*)value;
+               p->con.b = (int)val;
 	            break;
         default:
             yyerror("Constant node");

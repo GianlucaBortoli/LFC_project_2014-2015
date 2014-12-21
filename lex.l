@@ -32,7 +32,7 @@
 "=="					return DBE;
 "="						return EQ;
 "!="					return NE;
-"or"					reuturn OR;  // controllare mail per specifiche
+"or"					return OR; 
 "not"					return NOT;
 "and"					return AND;
 

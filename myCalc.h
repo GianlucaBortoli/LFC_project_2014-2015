@@ -1,30 +1,8 @@
 /* Bortoli Gianluca, n° 159993 */
 
-///////////////////////////
-// FUNCTIONS DEFINITIONS //
-///////////////////////////
-void yyerror(char *);
-int yylex();
-
-nodeType * opr(int, int, ...);
-nodeType * con(void *, varEnum);
-nodeType * id(char const *);
-nodeType * dic(char *, varEnum);
-//nodeType * block(nodeType * next); //add it for scoping
-
-symrec * getsym(char const *);
-symrec * putsym(char const *, varEnum);
-
-varEnum biggestType(varEnum, varEnum);
-
-//////////////////////
-// GLOBAL VARIABLES //
-//////////////////////
-extern symrec * symTable; 
-
-/////////////////////
-// USED STRUCTURES //
-/////////////////////
+////////////////
+// STRUCTURES //
+////////////////
 
 /*
 * allowed types for variables
@@ -56,32 +34,6 @@ typedef struct symrec {
 	struct symrec * next;
 } symrec;
 
-/*
-* defines one type of node I can have from nodeEnum above 
-* con -> constant
-* id -> identifiers/variables
-* opr -> operator
-* dic -> declaration
-*/
-typedef struct nodeType{
-    nodeEnum type;              
-    union {
-        conNodeType con;       
-        idNodeType id;          
-        oprNodeType opr;       
-        dicNodeType dic;        
-        //struct nodeType * blk;  /* scooping and procedure */
-    };
-} nodeType;
-
-/*
-* declaration
-*/
-typedef struct {
-    char * name;
-    varEnum type;
-} dicNodeType;
-
 /* 
 * constant
 */
@@ -109,3 +61,53 @@ typedef struct {
     int  nops;              /* number of operands */
     struct nodeType **op;	/* operands */
 } oprNodeType;
+
+/*
+* declaration
+*/
+typedef struct {
+    char * name;
+    varEnum type;
+} dicNodeType;
+
+/*
+* defines one type of node I can have from nodeEnum above 
+* con -> constant
+* id -> identifiers/variables
+* opr -> operator
+* dic -> declaration
+*/
+typedef struct nodeType{
+    nodeEnum type;              
+    union {
+        conNodeType con;       
+        idNodeType id;          
+        oprNodeType opr;       
+        dicNodeType dic;        
+        //struct nodeType * blk;  /* scooping and procedure */
+    };
+} nodeType;
+
+///////////////////////////
+// FUNCTIONS DEFINITIONS //
+///////////////////////////
+void yyerror(const char *);
+int yylex();
+
+nodeType * opr(int, int, ...);
+nodeType * con(float, varEnum);
+nodeType * id(char const *);
+nodeType * dic(char *, varEnum);
+//nodeType * block(nodeType * next); //add it for scoping
+
+symrec * getsym(char const *);
+symrec * putsym(char const *, varEnum);
+
+varEnum biggestType(varEnum, varEnum);
+
+conNodeType * ex(nodeType *);
+
+//////////////////////
+// GLOBAL VARIABLES //
+//////////////////////
+extern symrec * symTable; 

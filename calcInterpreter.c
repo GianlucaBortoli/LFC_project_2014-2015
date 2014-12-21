@@ -67,12 +67,11 @@ conNodeType * ex(nodeType *p) {
                 }
 
                 case FOR: { 
-                	symrec * s = getsym(p->opr.op[0]->id.name);
-                	s->value = ex(p->opr.op[1]);
+                	ex(opr(EQ, 2, p->opr.op[0], p->opr.op[1]));
 
-                	while(s->value < ex(p->opr.op[2])){
+                	while(opr(MIN, 2, p->opr.op[0], p->opr.op[1])){
                         ex(p->opr.op[3]);
-                        s->value++;
+                        ex(opr(EQ, 2, p->opr.op[0], con(1,INTTYPE)));
                     }
                     return 0;
                 }
@@ -114,14 +113,17 @@ conNodeType * ex(nodeType *p) {
                 	// switch over types in order to print in the right way the value
                     conNodeType * print = ex(p->opr.op[0]);
                     switch(print->type){
-                        case INTTYPE
+                        case INTTYPE:
                             printf("%d\n", print->i);
                             break;
-                        case REALTYPE:
+                        case REALTYPE: 
+                        	//a label can only be part of a statement and a declaration is not a statement
+                        	; 
+
                         	// 46 is the maximum length of float in C
                        		// I didn't figured out a smart(er) way to do this 
-                        	char * tmp = (char*)malloc(46 + 1);
-                            sprintf(tmp, "%f", to_print->r);
+                        	char * tmp = (char *)malloc(46 + 1);
+                            sprintf(tmp, "%f", print->r);
                             // substitute comma with dot, again
                             char * ch = tmp;
                             for(int i = 0; ch[i] != '.'; i++){
@@ -179,7 +181,7 @@ conNodeType * ex(nodeType *p) {
                                 yyerror("Not allowed type used.");
                     		}
                     	}
-    					yerror("Not allowed type used.");
+    					yyerror("Not allowed type used.");
                     }
                     return val;
                 }
@@ -189,11 +191,11 @@ conNodeType * ex(nodeType *p) {
                 	//type checking
                 	switch(a->type) {
                 		case INTTYPE:
-                			return con(- a->i, INTTYPE);
+                			return con(-(a->i), INTTYPE);
                 		case REALTYPE:
-                			return con(- a->r, REALTYPE);
+                			return con(-(a->r), REALTYPE);
                 		case BOOLTYPE:
-                		default;
+                		default:
                 			yyerror("Unable to execute operation");
                 	}
                 }
@@ -306,7 +308,7 @@ conNodeType * ex(nodeType *p) {
                     }
                 }
 
-                case DBQ:{
+                case DBE:{
                 	conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
                     //type checking

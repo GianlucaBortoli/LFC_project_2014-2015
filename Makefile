@@ -4,12 +4,12 @@ LEX = lex
 YACC = yacc -d
 CC = gcc -std=c99
 
-interpreter: y.tab.o lex.yy.o myClac.o calcInterpreter.o
-	$(CC) -o interpreter y.tab.o lex.yy.o myClac.o calcInterpreter.o -ll -lm
-
-myClac.o: myClac.c
+interpreter: y.tab.o lex.yy.o myCalc.o calcInterpreter.o
+	$(CC) -o interpreter y.tab.o lex.yy.o myCalc.o calcInterpreter.o -ll -lm
 
 calcInterpreter.o: calcInterpreter.c
+
+myCalc.o: myCalc.c
 
 lex.yy.o: lex.yy.c y.tab.h
 
@@ -20,4 +20,4 @@ lex.yy.c: lex.l
 	$(LEX) lex.l
 
 clean:
-	-rm -f *.o lex.yy.c *.tab.* interpreter *.output
+	rm -f *.o lex.yy.c *.tab.* interpreter *.output

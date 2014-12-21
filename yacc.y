@@ -3,7 +3,7 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include "myCalh.h"
+	#include "myCalc.h"
 
 	symrec * symTable = NULL; //global symbol table; check for scoping management
 %}
@@ -23,9 +23,9 @@
 ////////////
 // TOKENS //
 ////////////
-%token <iVal> INTEGER
-%token <rVal> REALVALUE
-%token <bVal> BOOLEAN
+%token <iValue> INTEGER
+%token <rValue> REALVALUE
+%token <bValue> BOOLEAN
 %token <varName> VARIABLE
 %token WHILE IF PRINT FOR TO INT REAL BOOL AND OR NOT PRINTINT PRINTREAL PRINTBOOL
 
@@ -36,9 +36,9 @@
 %nonassoc ELSE
 %left EQ
 %left AND OR
-%left DEQ NE GT LT GTE LTE
+%left DBE NE GT LT GRE LRE
 %left PLUS MIN
-%left MUL DIV
+%left MULT DIV
 %right NOT
 %nonassoc UMINUS RCURLY LCURLY LP RP COMMA SEMICOLON INTEGER REALVALUE BOOLEAN MAIN
 
@@ -100,21 +100,21 @@ expr: var      					// variable
     | LP expr RP    			{$$ = $2;}
     | expr PLUS expr  			{$$ = opr(PLUS,2,$1,$3);} // operations on numbers
     | expr MIN expr   			{$$ = opr(MIN,2,$1,$3);}
-    | expr MUL expr   			{$$ = opr(MUL,2,$1,$3);}
+    | expr MULT expr   			{$$ = opr(MULT,2,$1,$3);}
     | expr DIV expr   			{$$ = opr(DIV,2,$1,$3);}
     | MIN expr %prec UMINUS    	{$$ = opr(UMINUS,1,$2);}
     | expr LT expr          	{$$ = opr(LT,2,$1,$3);} // operations on booleans
     | expr GT expr          	{$$ = opr(GT,2,$1,$3);}
-    | expr LTE expr         	{$$ = opr(LTE,2,$1,$3);}
-    | expr GTE expr         	{$$ = opr(GTE,2,$1,$3);}
+    | expr LRE expr         	{$$ = opr(LRE,2,$1,$3);}
+    | expr GRE expr         	{$$ = opr(GRE,2,$1,$3);}
     | expr NE expr          	{$$ = opr(NE,2,$1,$3);}
-    | expr DEQ expr         	{$$ = opr(DEQ,2,$1,$3);}
+    | expr DBE expr         	{$$ = opr(DBE,2,$1,$3);}
     | expr AND expr         	{$$ = opr(AND,2,$1,$3);}
     | expr OR expr          	{$$ = opr(OR,2,$1,$3);}
     | NOT expr              	{$$ = opr(NOT,1,$2);}
-    | INTEGER	      			{$$ = con(&$1, INTTYPE);} // types
-    | REALNUM       			{$$ = con(&$1, REALTYPE);}
-    | BOOLEAN       			{$$ = con(&$1, BOOLTYPE);}
+    | INTEGER	      			{$$ = con($1, INTTYPE);} // types
+    | REALVALUE      			{$$ = con($1, REALTYPE);}
+    | BOOLEAN       			{$$ = con($1, BOOLTYPE);}
     ;
 
 %%
