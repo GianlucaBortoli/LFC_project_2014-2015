@@ -32,7 +32,7 @@ extern symrec * symTable;
 * booltype < inttype < realtype
 * Do not change, biggestType function won't work any more!
 */
-typedef enum{BOOLTYPE, INTTYPE, REALTYPE} varEnum; 
+typedef enum {BOOLTYPE, INTTYPE, REALTYPE} varEnum; 
 
 /* 
 * used in the struct nodeType to define the type of node

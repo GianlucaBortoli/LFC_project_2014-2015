@@ -40,7 +40,7 @@ conNodeType * ex(nodeType *p) {
                 exit(1);
             }
 
-            conNodeType * r = malloc(sizeof(ret));
+            conNodeType * r = malloc(sizeof(r));
             r->type = s->type; //type is the one of the var in the sym table
             switch(s->type){ //assign value depending on the type
                 case INTTYPE:
@@ -70,7 +70,7 @@ conNodeType * ex(nodeType *p) {
                 	symrec * s = getsym(p->opr.op[0]->id.name);
                 	s->value = ex(p->opr.op[1]);
 
-                	while(s->value - ex(p->opr.op[2])){
+                	while(s->value < ex(p->opr.op[2])){
                         ex(p->opr.op[3]);
                         s->value++;
                     }
@@ -150,82 +150,223 @@ conNodeType * ex(nodeType *p) {
                 case EQ: {
                     symrec * s = getsym(p->opr.op[0]->id.name);
                     if(s == NULL){
-                        fprintf(stderr, "There is not such '%s' varibale in the symtable\n", p->opr.op[0]->id.name);
+                        fprintf(stderr, "There is not such '%s' varibale in the symbol table\n", p->opr.op[0]->id.name);
                         exit(1);
                     }
 
-                    //add here coercion support
-                    conNodeType * val = ex(p->opr.op[1]);
-                    switch (val->type) {
-                        case INTTYPE:
-                            s->i = val->i;
-                            break;
-                        case REALTYPE:
-                            s->r = val->r;
-                            break;
-                        case BOOLTYPE:
-                            s->b = val->b;
-                            break;
-                        default:
-                            yyerror("Not allowed type used.");
+                    //type checking
+					conNodeType * val = ex(p->opr.op[1]);
+                    if(s->type == val->type){
+                    	switch (val->type) {
+	                        case INTTYPE:
+	                            s->i = val->i;
+	                            break;
+	                        case REALTYPE:
+	                            s->r = val->r;
+	                            break;
+	                        case BOOLTYPE:
+	                            s->b = val->b;
+	                            break;
+	                        default:
+                            	yyerror("Not allowed type used.");
+                    	}
+                    } else {
+                    	if(val->type == INTTYPE){
+                    		if(s->type == BOOLTYPE){
+                    			s->b = val->i != 0;
+                    		} else if(s->type == REALTYPE) {
+                    			s->r = val->i;
+                    		} else {
+                                yyerror("Not allowed type used.");
+                    		}
+                    	}
+    					yerror("Not allowed type used.");
                     }
                     return val;
                 }
 
                 case UMINUS: {
-                	conNodeType * val = -ex(p->opr.op[0]); 
-                	switch(val->type) {
+                	conNodeType * a = ex(p->opr.op[0]); 
+                	//type checking
+                	switch(a->type) {
                 		case INTTYPE:
-                			return val->i;
-                			break;
+                			return con(- a->i, INTTYPE);
                 		case REALTYPE:
-                			return val->r;
-                			break;
+                			return con(- a->r, REALTYPE);
                 		case BOOLTYPE:
-                			return val->b;
-                			break;
                 		default;
                 			yyerror("Unable to execute operation");
                 	}
                 }
 
                 case PLUS:{
+					conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
+                    //type checking
+                    if(a->type != b->type){
+                    	yyerror("Unable to execute operation");
+                    } else {
+                    	return a + b;
+                    }
                 }
 
                 case MIN:{
+                	conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
+                    //type checking
+                    if(a->type != b->type){
+                    	yyerror("Unable to execute operation");
+                    } else {
+                    	return a - b;
+                    }
                 }
 
                 case MULT:{
+                	conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
+                    //type checking
+                    if(a->type != b->type){
+                    	yyerror("Unable to execute operation");
+                    } else {
+                    	return a * b;
+                    }
                 }
 
                 case DIV:{
+                	conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
+                    //type checking
+                    if(a->type != b->type){
+                    	yyerror("Unable to execute operation");
+                    } else {
+                    	return a / b;
+                    }
                 }
 
                 case LT:{
+                	conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
+                    //type checking
+                    if((a->type == INTTYPE && b->type == INTTYPE) ||
+                       (a->type == INTTYPE && b->type == REALTYPE) ||
+                       (a->type == REALTYPE && b->type == INTTYPE) ||
+                   	   (a->type == REALTYPE && b->type == REALTYPE))
+                    {
+                    	return a < b;
+                    } else {
+                    	yyerror("Unable to execute operation");
+                    }
                 }
 
                 case GT:{
+                	conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
+                    //type checking
+                    if((a->type == INTTYPE && b->type == INTTYPE) ||
+                       (a->type == INTTYPE && b->type == REALTYPE) ||
+                       (a->type == REALTYPE && b->type == INTTYPE) ||
+                   	   (a->type == REALTYPE && b->type == REALTYPE))
+                    {
+                    	return a > b;
+                    } else {
+                    	yyerror("Unable to execute operation");
+                    }
                 }
 
                 case GRE:{
+                	conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
+                    //type checking
+                    if((a->type == INTTYPE && b->type == INTTYPE) ||
+                       (a->type == INTTYPE && b->type == REALTYPE) ||
+                       (a->type == REALTYPE && b->type == INTTYPE) ||
+                   	   (a->type == REALTYPE && b->type == REALTYPE))
+                    {
+                    	return a >= b;
+                    } else {
+                    	yyerror("Unable to execute operation");
+                    }
                 }
 
                 case LRE:{
+                	conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
+                    //type checking
+                    if((a->type == INTTYPE && b->type == INTTYPE) ||
+                       (a->type == INTTYPE && b->type == REALTYPE) ||
+                       (a->type == REALTYPE && b->type == INTTYPE) ||
+                   	   (a->type == REALTYPE && b->type == REALTYPE))
+                    {
+                    	return a <= b;
+                    } else {
+                    	yyerror("Unable to execute operation");
+                    }
                 }
 
                 case NE:{
+                	conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
+                    //type checking
+                    if((a->type == INTTYPE && b->type == INTTYPE) ||
+                       (a->type == INTTYPE && b->type == REALTYPE) ||
+                       (a->type == REALTYPE && b->type == INTTYPE) ||
+                   	   (a->type == REALTYPE && b->type == REALTYPE) ||
+                   	   (a->type == BOOLTYPE && b->type == BOOLTYPE))
+                    {
+                    	return a != b;
+                    } else {
+                    	yyerror("Unable to execute operation");
+                    }
                 }
 
                 case DBQ:{
+                	conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
+                    //type checking
+                    if((a->type == INTTYPE && b->type == INTTYPE) ||
+                       (a->type == INTTYPE && b->type == REALTYPE) ||
+                       (a->type == REALTYPE && b->type == INTTYPE) ||
+                   	   (a->type == REALTYPE && b->type == REALTYPE) ||
+                   	   (a->type == BOOLTYPE && b->type == BOOLTYPE))
+                    {
+                    	return a == b;
+                    } else {
+                    	yyerror("Unable to execute operation");
+                    }
                 }
 
                 case AND:{
+                	conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
+                    //type checking
+                    if((a->type == BOOLTYPE && b->type == BOOLTYPE))
+                    {
+                    	return a && b;
+                    } else {
+                    	yyerror("Unable to execute operation");
+                    }
                 }
 
                 case OR:{
+                	conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
+                    //type checking
+                    if((a->type == BOOLTYPE && b->type == BOOLTYPE))
+                    {
+                    	return a || b;
+                    } else {
+                    	yyerror("Unable to execute operation");
+                    }
                 }
 
                 case NOT:{
+                	conNodeType * a = ex(p->opr.op[0]);
+                	//type checking
+                	if(a->type == BOOLTYPE){
+                		return !a;
+                	} else {
+                		yyerror("Unable to execute operation");
+                	}
                 }
 
                 default:

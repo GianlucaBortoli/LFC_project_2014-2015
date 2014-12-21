@@ -55,7 +55,7 @@
 program: opt_declaration_list
         MAIN
         opt_stmt_list   {
-                            ex($1); // global variables
+                            ex($1); // variables declared before main
                             ex($3); // execute main
                             exit(0);
                         }
