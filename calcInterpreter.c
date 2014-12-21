@@ -3,13 +3,11 @@
 #include <stdio.h>
 #include "myCalc.h"
 #include "y.tab.h"
-
-typedef conNodeType ret;
 /*
 * Execute the parse tree
 * returns conNodeType to manage the given types, not only int
 */
-ret * ex(nodeType *p) {
+conNodeType * ex(nodeType *p) {
     if (p == 0){ //if node doesn't exist, exit
     	return 0;
     }  
@@ -40,7 +38,7 @@ ret * ex(nodeType *p) {
                 exit(1);
             }
 
-            ret * r = malloc(sizeof(ret));
+            conNodeType * r = malloc(sizeof(ret));
             r->type = s->type; //type is the one of the var in the sym table
             switch(s->type){ //assign value depending on the type
                 case INTTYPE:
@@ -92,7 +90,7 @@ ret * ex(nodeType *p) {
 				* I implemented the java-style print before writing printInt e printFloat
                 */
                 case PRINTINT: {
-                	ret * print = ex(p->opr.op[0]);
+                	conNodeType * print = ex(p->opr.op[0]);
                     if (print->type != INTTYPE) {
                         yyerror("The function printInt can print only integers.");
                     }
@@ -101,7 +99,7 @@ ret * ex(nodeType *p) {
                 }
 
                 case PRINTREAL: {
-                	ret * print = ex(p->opr.op[0]);
+                	conNodeType * print = ex(p->opr.op[0]);
                     if (print->type != REALTYPE) {
                         yyerror("The function printFloat can print only float.");
                     }
@@ -112,7 +110,7 @@ ret * ex(nodeType *p) {
                 case PRINT: {
                 	// I already do type checking in the print function
                 	// switch over types in order to print in the right way the value
-                    ret * print = ex(p->opr.op[0]);
+                    conNodeType * print = ex(p->opr.op[0]);
                     switch(print->type){
                         case INTTYPE
                             printf("%d\n", print->i);
@@ -155,7 +153,7 @@ ret * ex(nodeType *p) {
                     }
 
                     //add here coercion support
-                    ret * val = ex(p->opr.op[1]);
+                    conNodeType * val = ex(p->opr.op[1]);
                     switch (val->type) {
                         case INTTYPE:
                             s->i = val->i;
@@ -173,13 +171,13 @@ ret * ex(nodeType *p) {
                 }
 
                 case UMINUS: {
-                	ret * a = ex(p->opr.op[0]);
+                	conNodeType * a = ex(p->opr.op[0]);
                     return apply(&neg, a, NULL, a->type);
                 }
 
                 case PLUS:{
-                    ret * a = ex(p->opr.op[0]);
-                    ret * b = ex(p->opr.op[1]);
+                    conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
 
                     varTypeEnum dstType = max(a->type, b->type);
 
@@ -187,8 +185,8 @@ ret * ex(nodeType *p) {
                 }
 
                 case MIN:{
-                    ret * a = ex(p->opr.op[0]);
-                    ret * b = ex(p->opr.op[1]);
+                    conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
 
                     varTypeEnum dstType = max(a->type, b->type);
 
@@ -196,8 +194,8 @@ ret * ex(nodeType *p) {
                 }
 
                 case MULT: {
-                    ret * a = ex(p->opr.op[0]);
-                    ret * b = ex(p->opr.op[1]);
+                    conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
 
                     varTypeEnum dstType = max(a->type, b->type);
 
@@ -205,8 +203,8 @@ ret * ex(nodeType *p) {
                 }
 
                 case DIV: {
-                    ret * a = ex(p->opr.op[0]);
-                    ret * b = ex(p->opr.op[1]);
+                    conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
 
                     // TODO: add here type checking
                     varTypeEnum dstType = max(a->type, b->type);
@@ -215,36 +213,36 @@ ret * ex(nodeType *p) {
                 }
 
                 case LT: {
-                    ret * a = ex(p->opr.op[0]);
-                    ret * b = ex(p->opr.op[1]);
+                    conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
 
                     return apply(&lt, a, b, BOOLTYPE);
                 }
 
                 case GT: {
-                    ret * a = ex(p->opr.op[0]);
-                    ret * b = ex(p->opr.op[1]);
+                    conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
 
                     return apply(&gt, a, b, BOOLTYPE);
                 }
 
                 case GRE:{
-                    ret * a = ex(p->opr.op[0]);
-                    ret * b = ex(p->opr.op[1]);
+                    conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
 
                     return apply(&gte, a, b, BOOLTYPE);
                 }
 
                 case LRE: {
-                    ret * a = ex(p->opr.op[0]);
-                    ret * b = ex(p->opr.op[1]);
+                    conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
 
                     return apply(&lte, a, b, BOOLTYPE);
                 }
 
                 case NE: {
-                    ret * a = ex(p->opr.op[0]);
-                    ret * b = ex(p->opr.op[1]);
+                    conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
 
                     varTypeEnum dstType = max(a->type, b->type);
 
@@ -252,28 +250,28 @@ ret * ex(nodeType *p) {
                 }
 
                 case DBQ: {
-                    ret * a = ex(p->opr.op[0]);
-                    ret * b = ex(p->opr.op[1]);
+                    conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
 
                     return apply(&deq, a, b, BOOLTYPE);
                 }
 
                 case AND: {
-                    ret* a = ex(p->opr.op[0]);
-                    ret* b = ex(p->opr.op[1]);
+                    conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
 
                     return apply(&and, a, b, BOOLTYPE);
                 }
 
                 case OR: {
-                    ret* a = ex(p->opr.op[0]);
-                    ret* b = ex(p->opr.op[1]);
+                    conNodeType * a = ex(p->opr.op[0]);
+                    conNodeType * b = ex(p->opr.op[1]);
 
                     return apply(&or, a, b, BOOLTYPE);
                 }
 
                 case NOT:{
-                    ret* a = ex(p->opr.op[0]);
+                    conNodeType * a = ex(p->opr.op[0]);
                     return apply(&not, a, NULL, BOOLTYPE);
                 }
 
