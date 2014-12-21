@@ -104,6 +104,7 @@ symrec * getsym(char const *);
 symrec * putsym(char const *, varEnum);
 
 varEnum biggestType(varEnum, varEnum);
+float getTyped(conNodeType *);
 
 conNodeType * ex(nodeType *);
 conNodeType * coercion(conNodeType *, varEnum);

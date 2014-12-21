@@ -186,18 +186,34 @@ varEnum biggestType(varEnum a, varEnum b){
 * Execute coercion on types (when permitted)
 * type is the expected type
 */
-conNodeType * coercion(conNodeType * x, varEnum type){ //type di varEnum
-	if(!x || (x->type == type)){
+conNodeType * coercion(conNodeType * x, varEnum t){ //type di varEnum
+	if(!x || (x->type == t)){
 		return x;
 	} 
 	if(x->type == INTTYPE){
-		if(type == BOOLTYPE){
-			x->value = x->value != 0;
+		if(t == BOOLTYPE){
+			x->b = x->i != 0;
 		} else {
-			x->value = (float)x->value;
+			x->r = (float)x->i;
 		}
 		x->type = t;
 		return x;
 	}
 	yyerror("Coercion type error");
+}
+
+/*
+* Retrives a typed value from conNodeType
+*/
+float getTyped(conNodeType * x){
+	switch(x->type){
+		case INTTYPE:
+			return x->i;
+		case REALTYPE:
+			return x->r;
+		case BOOLTYPE:
+			return x->b;
+		default:
+			yyerror("Type can not be matched");
+	}
 }

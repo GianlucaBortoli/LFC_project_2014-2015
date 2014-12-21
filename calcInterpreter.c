@@ -203,10 +203,13 @@ conNodeType * ex(nodeType *p) {
                 case PLUS:{
 					conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
-                    //type checking
-                    if((a->type == b->type) &&
-                       (b->type != BOOLTYPE)){
-                    	return a + b;
+                    varEnum d = biggestType(a->type,b->type);
+
+                    coercion(a, d);
+                    coercion(b, d);
+
+                    if(a->type != BOOLTYPE){
+                    	return ex(con((getTyped(a) + getTyped(b)), a->type));
                     } else {
                     	yyerror("Unable to execute operation");
                     }
@@ -215,10 +218,13 @@ conNodeType * ex(nodeType *p) {
                 case MIN:{
                 	conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
-                    //type checking
-                    if((a->type == b->type) &&
-                       (b->type != BOOLTYPE)){
-                    	return a - b;
+                    varEnum d = biggestType(a->type,b->type);
+
+                    coercion(a, d);
+                    coercion(b, d);
+
+                    if(a->type != BOOLTYPE){
+                    	return ex(con((getTyped(a) - getTyped(b)), a->type));
                     } else {
                     	yyerror("Unable to execute operation");
                     }
@@ -227,10 +233,13 @@ conNodeType * ex(nodeType *p) {
                 case MULT:{
                 	conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
-                    //type checking
-                    if((a->type == b->type)&&
-                       (a->type != BOOLTYPE)) {
-                    	return a * b;
+                    varEnum d = biggestType(a->type,b->type);
+
+                    coercion(a, d);
+                    coercion(b, d);
+
+                    if(a->type != BOOLTYPE){
+                    	return ex(con((getTyped(a) * getTyped(b)), a->type));
                     } else {
                     	yyerror("Unable to execute operation");
                     }
@@ -239,10 +248,13 @@ conNodeType * ex(nodeType *p) {
                 case DIV:{
                 	conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
-                    //type checking
-                    if((a->type == b->type)&&
-                       (a->type != BOOLTYPE)) {
-                    	return a / b;
+                    varEnum d = biggestType(a->type,b->type);
+
+                    coercion(a, d);
+                    coercion(b, d);
+
+                    if(a->type != BOOLTYPE){
+                    	return ex(con((getTyped(a) / getTyped(b)), a->type));
                     } else {
                     	yyerror("Unable to execute operation");
                     }
@@ -251,10 +263,13 @@ conNodeType * ex(nodeType *p) {
                 case LT:{
                 	conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
-                    //type checking
-                    if((a->type == INTTYPE || a->type == REALTYPE) &&
-                   	   (a->type == b->type)) {
-                    	return a < b;
+                    varEnum d = biggestType(a->type,b->type);
+
+                    coercion(a, d);
+                    coercion(b, d);
+
+                    if(a->type != BOOLTYPE){
+                    	return ex(con((getTyped(a) < getTyped(b)), BOOLTYPE));
                     } else {
                     	yyerror("Unable to execute operation");
                     }
@@ -263,10 +278,13 @@ conNodeType * ex(nodeType *p) {
                 case GT:{
                 	conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
-                    //type checking
-                    if((a->type == INTTYPE || a->type == REALTYPE) &&
-                   	   (a->type == b->type)) {
-                    	return a > b;
+                    varEnum d = biggestType(a->type,b->type);
+
+                    coercion(a, d);
+                    coercion(b, d);
+
+                    if(a->type != BOOLTYPE){
+                    	return ex(con((getTyped(a) > getTyped(b)), BOOLTYPE));
                     } else {
                     	yyerror("Unable to execute operation");
                     }
@@ -275,10 +293,13 @@ conNodeType * ex(nodeType *p) {
                 case GRE:{
                 	conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
-                    //type checking
-                    if((a->type == INTTYPE || a->type == REALTYPE) &&
-                   	   (a->type == b->type)) {
-                    	return a >= b;
+                    varEnum d = biggestType(a->type,b->type);
+
+                    coercion(a, d);
+                    coercion(b, d);
+
+                    if(a->type != BOOLTYPE){
+                    	return ex(con((getTyped(a) >= getTyped(b)), BOOLTYPE));
                     } else {
                     	yyerror("Unable to execute operation");
                     }
@@ -287,10 +308,13 @@ conNodeType * ex(nodeType *p) {
                 case LRE:{
                 	conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
-                    //type checking
-                    if((a->type == INTTYPE || a->type == REALTYPE) &&
-                   	   (a->type == b->type)) {
-                    	return a <= b;
+                    varEnum d = biggestType(a->type,b->type);
+
+                    coercion(a, d);
+                    coercion(b, d);
+
+                    if(a->type != BOOLTYPE){
+                    	return ex(con((getTyped(a) <= getTyped(b)), BOOLTYPE));
                     } else {
                     	yyerror("Unable to execute operation");
                     }
@@ -299,10 +323,13 @@ conNodeType * ex(nodeType *p) {
                 case NE:{
                 	conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
-                    //type checking
-                    if((a->type == INTTYPE || a->type == REALTYPE) &&
-                   	   (a->type == b->type)) {
-                    	return a != b;
+                    varEnum d = biggestType(a->type,b->type);
+
+                    coercion(a, d);
+                    coercion(b, d);
+
+                    if(a->type != BOOLTYPE){
+                    	return ex(con((getTyped(a) != getTyped(b)), BOOLTYPE));
                     } else {
                     	yyerror("Unable to execute operation");
                     }
@@ -311,10 +338,13 @@ conNodeType * ex(nodeType *p) {
                 case DBE:{
                 	conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
-                    //type checking
-                    if((a->type == INTTYPE || a->type == REALTYPE) &&
-                   	   (a->type == b->type)) {
-                    	return a == b;
+                    varEnum d = biggestType(a->type,b->type);
+
+                    coercion(a, d);
+                    coercion(b, d);
+
+                    if(a->type != BOOLTYPE){
+                    	return ex(con((getTyped(a) == getTyped(b)), BOOLTYPE));
                     } else {
                     	yyerror("Unable to execute operation");
                     }
@@ -323,33 +353,28 @@ conNodeType * ex(nodeType *p) {
                 case AND:{
                 	conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
-                    //type checking
-                    if((a->type == BOOLTYPE && b->type == BOOLTYPE)) {
-                    	return a && b;
-                    } else {
-                    	yyerror("Unable to execute operation");
-                    }
+
+                    coercion(a, BOOLTYPE);
+                    coercion(b, BOOLTYPE);
+
+                    return ex(con((getTyped(a) && getTyped(b)), BOOLTYPE));
                 }
 
                 case OR:{
                 	conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
-                    //type checking
-                    if((a->type == BOOLTYPE && b->type == BOOLTYPE)) {
-                    	return a || b;
-                    } else {
-                    	yyerror("Unable to execute operation");
-                    }
+
+                    coercion(a, BOOLTYPE);
+                    coercion(b, BOOLTYPE);
+                    
+                    return ex(con((getTyped(a) || getTyped(b)), BOOLTYPE));
                 }
 
                 case NOT:{
                 	conNodeType * a = ex(p->opr.op[0]);
-                	//type checking
-                	if(a->type == BOOLTYPE){
-                		return !a;
-                	} else {
-                		yyerror("Unable to execute operation");
-                	}
+                    coercion(a, BOOLTYPE);
+                    
+                    return ex(con(!getTyped(a), BOOLTYPE));
                 }
 
                 default:
@@ -362,4 +387,5 @@ conNodeType * ex(nodeType *p) {
         }
     yyerror("Error!");
     exit(1);
+}
 }
