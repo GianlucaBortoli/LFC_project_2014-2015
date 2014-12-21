@@ -1,3 +1,5 @@
+# Bortoli Gianluca, n° 159993
+
 LEX = lex
 YACC = yacc -d
 CC = gcc -std=c99

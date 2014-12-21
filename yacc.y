@@ -112,7 +112,7 @@ expr: var      					// variable
     | expr AND expr         	{$$ = opr(AND,2,$1,$3);}
     | expr OR expr          	{$$ = opr(OR,2,$1,$3);}
     | NOT expr              	{$$ = opr(NOT,1,$2);}
-    |INTEGER	      			{$$ = con(&$1, INTTYPE);} // types
+    | INTEGER	      			{$$ = con(&$1, INTTYPE);} // types
     | REALNUM       			{$$ = con(&$1, REALTYPE);}
     | BOOLEAN       			{$$ = con(&$1, BOOLTYPE);}
     ;
