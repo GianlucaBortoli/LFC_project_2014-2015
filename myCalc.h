@@ -15,6 +15,8 @@ nodeType * dic(char *, varEnum);
 symrec * getsym(char const *);
 symrec * putsym(char const *, varEnum);
 
+varEnum biggestType(varEnum, varEnum);
+
 //////////////////////
 // GLOBAL VARIABLES //
 //////////////////////
@@ -26,6 +28,9 @@ extern symrec * symTable;
 
 /*
 * allowed types for variables
+* The order in which they are declared here is VERY important:
+* booltype < inttype < realtype
+* Do not change, biggestType function won't work any more!
 */
 typedef enum{BOOLTYPE, INTTYPE, REALTYPE} varEnum; 
 

@@ -21,7 +21,7 @@ void yyerror(char * m){
 nodeType * opr(int oper, int nops, ...){
 	/* 
     * (ap = argument pointer) va_list is used to declare a variable
-    * which, from time to time, is referring to an argument
+    * which, from time tomax time, is referring to an argument
     */
     va_list ap;
     nodeType *p;
@@ -167,4 +167,16 @@ symrec *putsym (char const * identifier, varEnum t) {
 
     symTable = ptr;
     return ptr;
+}
+
+/*
+* Returns the biggest type, wrt the order in which types are declared
+* into varEnum (myCalc.h). This order is mandatory!
+*/
+varEnum biggestType(varEnum a, varEnum b){
+	if(a > b){
+		return a;
+	} else {
+		return b;
+	}
 }

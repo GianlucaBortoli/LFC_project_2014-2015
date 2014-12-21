@@ -1,3 +1,5 @@
+/* Bortoli Gianluca, n° 159993 */
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -171,24 +173,34 @@ conNodeType * ex(nodeType *p) {
                 }
 
                 case UMINUS: {
-                	conNodeType * a = ex(p->opr.op[0]);
-                    return apply(&neg, a, NULL, a->type);
+                	conNodeType * val = -ex(p->opr.op[0]); 
+                	switch(val->type) {
+                		case INTTYPE:
+                			return val->i;
+                			break;
+                		case REALTYPE:
+                			return val->r;
+                			break;
+                		case BOOLTYPE:
+                			return val->b;
+                			break;
+                		default;
+                			yyerror("Unable to execute operation");
+                	}
                 }
 
                 case PLUS:{
-                    conNodeType * a = ex(p->opr.op[0]);
-                    conNodeType * b = ex(p->opr.op[1]);
-
-                    varTypeEnum dstType = max(a->type, b->type);
-
-                    return apply(&sum, a, b, dstType);
+                	conNodeType * val = ex(p->opr.op[0]) + ex(p->opr.op[1]);
+                	switch(val->type){
+                		case 
+                	}
                 }
 
                 case MIN:{
                     conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
 
-                    varTypeEnum dstType = max(a->type, b->type);
+                    varTypeEnum dstType = biggestType(a->type, b->type);
 
                     return apply(&min, a, b, dstType);
                 }
@@ -197,7 +209,7 @@ conNodeType * ex(nodeType *p) {
                     conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
 
-                    varTypeEnum dstType = max(a->type, b->type);
+                    varTypeEnum dstType = biggestType(a->type, b->type);
 
                     return apply(&mul, a, b, dstType);
                 }
@@ -207,7 +219,7 @@ conNodeType * ex(nodeType *p) {
                     conNodeType * b = ex(p->opr.op[1]);
 
                     // TODO: add here type checking
-                    varTypeEnum dstType = max(a->type, b->type);
+                    varTypeEnum dstType = biggestType(a->type, b->type);
 
                     return apply(&dvi, a, b, dstType);
                 }
@@ -244,7 +256,7 @@ conNodeType * ex(nodeType *p) {
                     conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);
 
-                    varTypeEnum dstType = max(a->type, b->type);
+                    varTypeEnum dstType = biggestType(a->type, b->type);
 
                     return apply(&neq, a, b, BOOLTYPE);
                 }
