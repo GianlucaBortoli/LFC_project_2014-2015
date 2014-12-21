@@ -190,101 +190,42 @@ conNodeType * ex(nodeType *p) {
                 }
 
                 case PLUS:{
-                	conNodeType * val = ex(p->opr.op[0]) + ex(p->opr.op[1]);
-                	switch(val->type){
-                		case 
-                	}
                 }
 
                 case MIN:{
-                    conNodeType * a = ex(p->opr.op[0]);
-                    conNodeType * b = ex(p->opr.op[1]);
-
-                    varTypeEnum dstType = biggestType(a->type, b->type);
-
-                    return apply(&min, a, b, dstType);
                 }
 
-                case MULT: {
-                    conNodeType * a = ex(p->opr.op[0]);
-                    conNodeType * b = ex(p->opr.op[1]);
-
-                    varTypeEnum dstType = biggestType(a->type, b->type);
-
-                    return apply(&mul, a, b, dstType);
+                case MULT:{
                 }
 
-                case DIV: {
-                    conNodeType * a = ex(p->opr.op[0]);
-                    conNodeType * b = ex(p->opr.op[1]);
-
-                    // TODO: add here type checking
-                    varTypeEnum dstType = biggestType(a->type, b->type);
-
-                    return apply(&dvi, a, b, dstType);
+                case DIV:{
                 }
 
-                case LT: {
-                    conNodeType * a = ex(p->opr.op[0]);
-                    conNodeType * b = ex(p->opr.op[1]);
-
-                    return apply(&lt, a, b, BOOLTYPE);
+                case LT:{
                 }
 
-                case GT: {
-                    conNodeType * a = ex(p->opr.op[0]);
-                    conNodeType * b = ex(p->opr.op[1]);
-
-                    return apply(&gt, a, b, BOOLTYPE);
+                case GT:{
                 }
 
                 case GRE:{
-                    conNodeType * a = ex(p->opr.op[0]);
-                    conNodeType * b = ex(p->opr.op[1]);
-
-                    return apply(&gte, a, b, BOOLTYPE);
                 }
 
-                case LRE: {
-                    conNodeType * a = ex(p->opr.op[0]);
-                    conNodeType * b = ex(p->opr.op[1]);
-
-                    return apply(&lte, a, b, BOOLTYPE);
+                case LRE:{
                 }
 
-                case NE: {
-                    conNodeType * a = ex(p->opr.op[0]);
-                    conNodeType * b = ex(p->opr.op[1]);
-
-                    varTypeEnum dstType = biggestType(a->type, b->type);
-
-                    return apply(&neq, a, b, BOOLTYPE);
+                case NE:{
                 }
 
-                case DBQ: {
-                    conNodeType * a = ex(p->opr.op[0]);
-                    conNodeType * b = ex(p->opr.op[1]);
-
-                    return apply(&deq, a, b, BOOLTYPE);
+                case DBQ:{
                 }
 
-                case AND: {
-                    conNodeType * a = ex(p->opr.op[0]);
-                    conNodeType * b = ex(p->opr.op[1]);
-
-                    return apply(&and, a, b, BOOLTYPE);
+                case AND:{
                 }
 
-                case OR: {
-                    conNodeType * a = ex(p->opr.op[0]);
-                    conNodeType * b = ex(p->opr.op[1]);
-
-                    return apply(&or, a, b, BOOLTYPE);
+                case OR:{
                 }
 
                 case NOT:{
-                    conNodeType * a = ex(p->opr.op[0]);
-                    return apply(&not, a, NULL, BOOLTYPE);
                 }
 
                 default:
