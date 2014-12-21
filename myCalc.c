@@ -181,3 +181,23 @@ varEnum biggestType(varEnum a, varEnum b){
 		return b;
 	}
 }
+
+/*
+* Execute coercion on types (when permitted)
+* type is the expected type
+*/
+conNodeType * coercion(conNodeType * x, varEnum type){ //type di varEnum
+	if(!x || (x->type == type)){
+		return x;
+	} 
+	if(x->type == INTTYPE){
+		if(type == BOOLTYPE){
+			x->value = x->value != 0;
+		} else {
+			x->value = (float)x->value;
+		}
+		x->type = t;
+		return x;
+	}
+	yyerror("Coercion type error");
+}

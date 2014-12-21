@@ -93,7 +93,7 @@ stmt: SEMICOLON                                     {$$ = opr(SEMICOLON, 2, NULL
     | IF LP expr RP stmt %prec IFX                  {$$ = opr(IF,2,$3,$5);}
     | IF LP expr RP stmt ELSE stmt                  {$$ = opr(IF,3,$3,$5,$7);}
     | FOR LP var EQ expr TO expr RP stmt       		{$$ = opr(FOR,4,$3,$5,$7,$9);}
-    | LCURLY stmt_list RCURLY                       //{$$ = block($2);}
+    | LCURLY stmt_list RCURLY                       {$$ = $2;}
     ;
 
 expr: var      					// variable

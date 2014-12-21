@@ -191,9 +191,9 @@ conNodeType * ex(nodeType *p) {
                 	//type checking
                 	switch(a->type) {
                 		case INTTYPE:
-                			return con(-(a->i), INTTYPE);
+                			return ex(con(-(a->i), INTTYPE));
                 		case REALTYPE:
-                			return con(-(a->r), REALTYPE);
+                			return ex(con(-(a->r), REALTYPE));
                 		case BOOLTYPE:
                 		default:
                 			yyerror("Unable to execute operation");

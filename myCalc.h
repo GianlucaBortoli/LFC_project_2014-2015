@@ -106,6 +106,7 @@ symrec * putsym(char const *, varEnum);
 varEnum biggestType(varEnum, varEnum);
 
 conNodeType * ex(nodeType *);
+conNodeType * coercion(conNodeType *, varEnum);
 
 //////////////////////
 // GLOBAL VARIABLES //
