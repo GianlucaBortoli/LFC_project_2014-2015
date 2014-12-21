@@ -75,16 +75,17 @@ nodeType * con(void * val, varEnum type){
 }
 
 /*
-*
+* Returns the node pointer (of type nodeId) corresponding to 
+* ide in the symbol table
 */
 nodeType * id (char const * ide) {
 	nodeType * p;
     if((p = (nodeType *)malloc(sizeof(nodeType))) == NULL){
         yyerror("out of memory");
     }
-    p->type 	= typeId;
-    p->id.name 	= (char *)malloc(sizeof(strlen(name)) + 1);
-    strcpy(p->id.name, ide->name);
+    p->type 	= nodeId;
+    p->id.name 	= (char *)malloc(sizeof(strlen(ide)) + 1);
+    strcpy(p->id.name, ide);
 
     /*
 	* This is wrong because if a variable is not declared yet we should not 
@@ -97,6 +98,23 @@ nodeType * id (char const * ide) {
     /*if(getsym(p->id.name) == NULL){
         putsym(p->id.name);
     }*/
+    return p;
+}
+
+/*
+* Creates declaration node
+* need type as parameter in order to set 
+* the proper conNodeType field of union
+*/
+nodeType * dic(char * ide, varEnum type) {
+	nodeType * p;
+    if((p = (nodeType *)malloc(sizeof(nodeType))) == NULL){
+        yyerror("out of memory");
+    }
+    p->type 	= nodeDic;
+    p->id.name 	= (char *)malloc(sizeof(strlen(ide)) + 1);
+    strcpy(p->id.name, ide);
+
     return p;
 }
 
