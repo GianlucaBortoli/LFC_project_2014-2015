@@ -95,9 +95,9 @@ conNodeType * ex(nodeType *p) {
                     return 0;
                 }
                 /*
-				* The print function is already polymorphic: printInt e printBool
-				* is a sort of workaround in order to pass early tests.
-				* I implemented the java-style print before writing printInt e printFloat
+				* The print function is already polymorphic
+				* This is a sort of workaround in order to pass "early" tests.
+				* I implemented the java-style print before writing printInt e printReal
                 */
                 case PRINTINT: {
                 	conNodeType * print = ex(p->opr.op[0]);
@@ -111,7 +111,7 @@ conNodeType * ex(nodeType *p) {
                 case PRINTREAL: {
                 	conNodeType * print = ex(p->opr.op[0]);
                     if (print->type != REALTYPE) {
-                        yyerror("The function printFloat can print only float.");
+                        yyerror("The function printReal can print only float.");
                     }
                     //a label can only be part of a statement and a declaration is not a statement
                     // 46 is the maximum length of float in C
