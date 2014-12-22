@@ -19,7 +19,7 @@ conNodeType * ex(nodeType *p) {
         case nodeDic: {
 	      	//check if var already declared earlier
 	        if (getsym(p->dic.name)) { 
-	            fprintf(stderr, "%s is already declared.", p->dic.name);
+	            fprintf(stderr, "%s is already declared\n", p->dic.name);
 	            exit(1);
 	        }
 	        //if not decleared, put in symbol table its name and type
@@ -52,7 +52,7 @@ conNodeType * ex(nodeType *p) {
                 case BOOLTYPE:
                     r->b = s->b;
                     break;
-                default: //type not recognized
+                default:
                     yyerror("Type not recognized.");
             }
             return r;
@@ -61,23 +61,28 @@ conNodeType * ex(nodeType *p) {
         case nodeOpr: {
             switch(p->opr.oper) {
                 case WHILE: {
-                    while((*ex(p->opr.op[0])).b)
+                    while(coercion(ex(p->opr.op[0]), BOOLTYPE)->b)
                         ex(p->opr.op[1]);
                     return 0;
                 }
 
                 case FOR: { 
+                    //assignment before for statement
                 	ex(opr(EQ, 2, p->opr.op[0], p->opr.op[1]));
-
-                	while(opr(MIN, 2, p->opr.op[0], p->opr.op[1])){
+                    conNodeType * a;
+                    //fake for with while
+                	while(ex(opr(LT, 2, p->opr.op[0], p->opr.op[2]))->b) {
                         ex(p->opr.op[3]);
-                        ex(opr(EQ, 2, p->opr.op[0], con(1,INTTYPE)));
+                        // 3:05 AM coded -_-
+                        ex(opr(EQ, 2, p->opr.op[0], 
+                            con(getTyped(a = ex(opr(PLUS, 2, p->opr.op[0], con(1,INTTYPE)))), a->type)
+                            ));
                     }
                     return 0;
                 }
 
                 case IF: {
-                	if (ex(p->opr.op[0])){                  
+                	if (coercion(ex(p->opr.op[0]), BOOLTYPE)->b){                  
                         ex(p->opr.op[1]);
                     }
                     else if (p->opr.nops > 2) {
@@ -95,8 +100,8 @@ conNodeType * ex(nodeType *p) {
                     if (print->type != INTTYPE) {
                         yyerror("The function printInt can print only integers.");
                     }
-                    return 0;
                     printf("%d\n", print->i);
+                    return 0;
                 }
 
                 case PRINTREAL: {
@@ -104,8 +109,22 @@ conNodeType * ex(nodeType *p) {
                     if (print->type != REALTYPE) {
                         yyerror("The function printFloat can print only float.");
                     }
+                    //a label can only be part of a statement and a declaration is not a statement
+                    // 46 is the maximum length of float in C
+                    // I didn't figured out a smart(er) way to do this 
+                    char * tmp = (char *)malloc(46 + 1);
+                    sprintf(tmp, "%f", print->r);
+
+                    // substitute comma with dot, again
+                    for(int i = 0 ; ; i++){
+                        if(tmp[i] == '.'){
+                            tmp[i] = ',';
+                            break;
+                        }
+                    }
+                    printf("%s\n", tmp);
+                    free(tmp);
                     return 0;
-                    printf("%f\n", print->r);
                 }
 
                 case PRINT: {
@@ -119,15 +138,17 @@ conNodeType * ex(nodeType *p) {
                         case REALTYPE: 
                         	//a label can only be part of a statement and a declaration is not a statement
                         	; 
-
                         	// 46 is the maximum length of float in C
                        		// I didn't figured out a smart(er) way to do this 
                         	char * tmp = (char *)malloc(46 + 1);
                             sprintf(tmp, "%f", print->r);
+
                             // substitute comma with dot, again
-                            char * ch = tmp;
-                            for(int i = 0; ch[i] != '.'; i++){
-                            	ch[i] = ',';
+                            for(int i = 0 ; ; i++){
+                                if(tmp[i] == '.'){
+                                    tmp[i] = ',';
+                                    break;
+                                }
                             }
                             printf("%s\n", tmp);
                             free(tmp);
@@ -152,11 +173,11 @@ conNodeType * ex(nodeType *p) {
                 case EQ: {
                     symrec * s = getsym(p->opr.op[0]->id.name);
                     if(s == NULL){
-                        fprintf(stderr, "There is not such '%s' varibale in the symbol table\n", p->opr.op[0]->id.name);
+                        fprintf(stderr, "There is not '%s' varibale in the symbol table\n", p->opr.op[0]->id.name);
                         exit(1);
                     }
-                    //type checking
-					conNodeType * val = ex(p->opr.op[1]);
+
+					conNodeType * val = coercion(ex(p->opr.op[1]), s->type);
                     if(s->type == val->type){
                     	switch (val->type) {
 	                        case INTTYPE:
@@ -328,11 +349,7 @@ conNodeType * ex(nodeType *p) {
                     coercion(a, d);
                     coercion(b, d);
 
-                    if(a->type != BOOLTYPE){
-                    	return ex(con((getTyped(a) != getTyped(b)), BOOLTYPE));
-                    } else {
-                    	yyerror("Unable to execute operation");
-                    }
+                    return ex(con((getTyped(a) != getTyped(b)), BOOLTYPE));
                 }
 
                 case DBE:{
@@ -343,11 +360,7 @@ conNodeType * ex(nodeType *p) {
                     coercion(a, d);
                     coercion(b, d);
 
-                    if(a->type != BOOLTYPE){
-                    	return ex(con((getTyped(a) == getTyped(b)), BOOLTYPE));
-                    } else {
-                    	yyerror("Unable to execute operation");
-                    }
+                    return ex(con((getTyped(a) == getTyped(b)), BOOLTYPE));
                 }
 
                 case AND:{
@@ -377,15 +390,16 @@ conNodeType * ex(nodeType *p) {
                     return ex(con(!getTyped(a), BOOLTYPE));
                 }
 
-                default:
+                default:{
                 	yyerror("Operator not recognized.");
+                }
             }
        		break;
-
+       	}
+       	
         default:
         	yyerror("Node can not be matched");
-        }
+    }
     yyerror("Error!");
     exit(1);
-}
 }

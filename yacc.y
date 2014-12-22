@@ -8,7 +8,7 @@
 	symrec * symTable = NULL; //global symbol table; check for scoping management
 %}
 
-%error-verbose //yacc stuff
+%error-verbose // yacc stuff
 
 %union {
     int     iValue;//int
@@ -27,7 +27,7 @@
 %token <rValue> REALVALUE
 %token <bValue> BOOLEAN
 %token <varName> VARIABLE
-%token WHILE IF PRINT FOR TO INT REAL BOOL AND OR NOT PRINTINT PRINTREAL PRINTBOOL
+%token WHILE IF PRINT FOR TO INT REAL BOOL AND OR NOT PRINTINT PRINTREAL
 
 //////////////////////////////////////////////////
 // PRECEDENCE & ASSOCIATIVITY FOR ALL OPERATORS //
@@ -78,16 +78,15 @@ opt_stmt_list:	/* empty */ 	{$$ = NULL;} // this declaration is optional -> NULL
 				;
 
 stmt_list:		stmt_list stmt 	{$$ = opr(SEMICOLON, 2, $1, $2);}
-				| stmt
+				| stmt     		{$$ = $1;}
 				;
 
 stmt: SEMICOLON                                     {$$ = opr(SEMICOLON, 2, NULL, NULL);}
-    | declaration
-    | expr SEMICOLON
+    | declaration 									{$$ = $1;}
+    | expr SEMICOLON   								{$$ = $1;}
     | PRINT expr SEMICOLON                          {$$ = opr(PRINT,1,$2);}
     | PRINTINT expr SEMICOLON                       {$$ = opr(PRINTINT,1,$2);}
     | PRINTREAL expr SEMICOLON                      {$$ = opr(PRINTREAL,1,$2);}
-    | PRINTBOOL expr SEMICOLON                      {$$ = opr(PRINTBOOL,1,$2);}
     | var EQ expr SEMICOLON                   		{$$ = opr(EQ,2,$1,$3);}
     | WHILE LP expr RP stmt                         {$$ = opr(WHILE,2,$3,$5);}
     | IF LP expr RP stmt %prec IFX                  {$$ = opr(IF,2,$3,$5);}
@@ -96,7 +95,7 @@ stmt: SEMICOLON                                     {$$ = opr(SEMICOLON, 2, NULL
     | LCURLY stmt_list RCURLY                       {$$ = $2;}
     ;
 
-expr: var      					// variable
+expr: var      					{$$ = $1;} // variable
     | LP expr RP    			{$$ = $2;}
     | expr PLUS expr  			{$$ = opr(PLUS,2,$1,$3);} // operations on numbers
     | expr MIN expr   			{$$ = opr(MIN,2,$1,$3);}

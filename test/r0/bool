@@ -7,5 +7,5 @@ main {
     c = a and b;
     print c;
     b = not a;
-    print a || not b;
+    print a or not b;
 }

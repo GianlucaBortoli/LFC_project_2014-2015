@@ -27,8 +27,8 @@
 "true"					{yylval.bValue = 1; return BOOLEAN;}
 "false"					{yylval.bValue = 0; return BOOLEAN;}
 
-"<="					return GRE; //bool operations
-">="					return LRE;
+"<="					return LRE; //bool operations
+">="					return GRE;
 "=="					return DBE;
 "="						return EQ;
 "!="					return NE;
@@ -43,24 +43,15 @@
 "<"						return LT;
 ">"						return GT;
 
-[ \t\n]         		; // symbols 
-\;              		return SEMICOLON; 
-\,              		return COMMA;
-\(              		return LP;
-\)              		return RP;
-\{              		return LCURLY;
-\}              		return RCURLY;
-.            		   	{ECHO; yyerror("Previous char is unknown to lexer");}
+0             			{
+                    		yylval.iValue = 0;
+                    		return INTEGER;
+                		}
 
 [1-9][0-9]* 		    {
 		                    yylval.iValue = atoi(yytext);
 		                    return INTEGER;
 		                }
-
-0             			{
-                    		yylval.iValue = atoi(yytext);
-                    		return INTEGER;
-                		}
 
 [a-zA-Z][a-zA-Z0-9]*  	{	// +1 for the \0 at the end of the string
 							yylval.varName = (char *)malloc(strlen(yytext)+1);
@@ -74,19 +65,29 @@
 							// +1 for the \0 at the end of the string
                             char * tmp = (char *)malloc(strlen(yytext)+1);
                             strcpy(tmp, yytext);
-
-                            char * ch = tmp; 
                             // find the comma inside the string
-                            for (int i = 0; ch[i] != ','; i++){
-                            	if(ch[i] == ','){
+                            for (int i = 0 ; ; i++){
+                            	if(tmp[i] == ','){
                             		// comma is in there for sure when I match this regexp
                             		// so when I find it, I replace it with the dot to use internal
                             		// c rappresentation for float numpers
-                            		ch[i] = '.'; 
+                            		tmp[i] = '.'; 
+                            		break;
                             	}
                           	}
                             yylval.rValue = atof(tmp);
+                            free(tmp);
                             // return number with replacement
                             return REALVALUE;
                         }
+
+[ \t\n]         		; // symbols 
+\;              		return SEMICOLON; 
+\,              		return COMMA;
+\(              		return LP;
+\)              		return RP;
+\{              		return LCURLY;
+\}              		return RCURLY;
+.            		   	{ECHO; yyerror("Previous char is unknown to lexer");}
+
 %%

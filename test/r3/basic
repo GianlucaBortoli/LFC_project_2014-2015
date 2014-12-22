@@ -4,7 +4,9 @@ main{
 	bool b;
 	i = 1;
 	r = 1,1;
+
 	b = i; 
+
 	if(b){
 		r = (3*3);
 		printReal r;

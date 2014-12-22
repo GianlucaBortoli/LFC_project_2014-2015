@@ -11,7 +11,7 @@
 * No need to call exit every time
 */
 void yyerror(const char * m){
-	fprintf(stdout, "%s", m);
+	fprintf(stdout, "%s\n", m);
 	exit(1);
 }
 
@@ -67,8 +67,8 @@ nodeType * con(float val, varEnum type){
             p->con.r = (float)val;
             break;
         case BOOLTYPE:
-               p->con.b = (int)val;
-	            break;
+               p->con.b = val != 0;
+	        break;
         default:
             yyerror("Constant node");
     }
@@ -79,7 +79,7 @@ nodeType * con(float val, varEnum type){
 * Returns the node pointer (of type nodeId) corresponding to 
 * ide in the symbol table
 */
-nodeType * id (char const * ide) {
+nodeType * id(char const * ide) {
 	nodeType * p;
     if((p = (nodeType *)malloc(sizeof(nodeType))) == NULL){
         yyerror("out of memory");
@@ -113,7 +113,8 @@ nodeType * dic(char * ide, varEnum type) {
         yyerror("out of memory");
     }
     p->type 	= nodeDic;
-    p->id.name 	= (char *)malloc(sizeof(strlen(ide)) + 1);
+    p->dic.type 	= type;
+    p->dic.name 	= (char *)malloc(sizeof(strlen(ide)) + 1);
     strcpy(p->id.name, ide);
 
     return p;
@@ -200,6 +201,7 @@ conNodeType * coercion(conNodeType * x, varEnum t){ //type di varEnum
 		return x;
 	}
 	yyerror("Coercion type error");
+	return 0;
 }
 
 /*

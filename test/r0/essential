@@ -11,6 +11,8 @@ main {
    b = true;
    print b;
 
+   print 5,4;
+
    real c;
    c = 2,3;
    print c;
