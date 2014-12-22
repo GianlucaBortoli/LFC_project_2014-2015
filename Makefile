@@ -1,4 +1,4 @@
-# Bortoli Gianluca, n° 159993
+# Bortoli Gianluca 159993
 
 LEX = lex
 YACC = yacc -d

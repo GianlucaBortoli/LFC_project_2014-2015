@@ -1,4 +1,4 @@
-/* Bortoli Gianluca, n° 159993 */
+/* Bortoli Gianluca 159993 */
 
 /*
 * This file contains the interpreter, which is mainly the ex function
