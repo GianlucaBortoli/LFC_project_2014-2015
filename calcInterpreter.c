@@ -1,5 +1,9 @@
 /* Bortoli Gianluca, n° 159993 */
 
+/*
+* This file contains the interpreter, which is mainly the ex function
+* It evauates every node, through the switch
+*/
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -136,7 +140,7 @@ conNodeType * ex(nodeType *p) {
                             printf("%d\n", print->i);
                             break;
                         case REALTYPE: 
-                        	//a label can only be part of a statement and a declaration is not a statement
+                        	// "a label can only be part of a statement and a declaration is not a statement"
                         	; 
                         	// 46 is the maximum length of float in C
                        		// I didn't figured out a smart(er) way to do this 
@@ -177,6 +181,7 @@ conNodeType * ex(nodeType *p) {
                         exit(1);
                     }
 
+                    // coercion over types on assignment before
 					conNodeType * val = coercion(ex(p->opr.op[1]), s->type);
                     if(s->type == val->type){
                     	switch (val->type) {
@@ -209,7 +214,7 @@ conNodeType * ex(nodeType *p) {
 
                 case UMINUS: {
                 	conNodeType * a = ex(p->opr.op[0]); 
-                	//type checking
+                	//type checking with a switch is enough this time
                 	switch(a->type) {
                 		case INTTYPE:
                 			return ex(con(-(a->i), INTTYPE));
@@ -221,6 +226,12 @@ conNodeType * ex(nodeType *p) {
                 	}
                 }
 
+                /*
+                * For every operator, I do coercion between the "biggest type" possible between the two
+                * Execution on nodes is done only when proper constraint over type is matched
+                * This is done in: PLUS, MIN, MULT, DIV, LT, GT, GRE, LRE, NE, DBE, AND, OR and NOT
+                * In case a node of the proper type is matched, an error is raised
+                */
                 case PLUS:{
 					conNodeType * a = ex(p->opr.op[0]);
                     conNodeType * b = ex(p->opr.op[1]);

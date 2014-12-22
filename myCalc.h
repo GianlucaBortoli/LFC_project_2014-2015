@@ -98,7 +98,6 @@ nodeType * opr(int, int, ...);
 nodeType * con(float, varEnum);
 nodeType * id(char const *);
 nodeType * dic(char *, varEnum);
-//nodeType * block(nodeType * next); //add it for scoping
 
 symrec * getsym(char const *);
 symrec * putsym(char const *, varEnum);

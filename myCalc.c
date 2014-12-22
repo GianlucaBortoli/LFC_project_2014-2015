@@ -173,7 +173,7 @@ symrec *putsym (char const * identifier, varEnum t) {
 
 /*
 * Returns the biggest type, wrt the order in which types are declared
-* into varEnum (myCalc.h). This order is mandatory!
+* into varEnum (myCalc.h) whose order is mandatory!
 */
 varEnum biggestType(varEnum a, varEnum b){
 	if(a > b){
@@ -184,7 +184,7 @@ varEnum biggestType(varEnum a, varEnum b){
 }
 
 /*
-* Execute coercion on types (when permitted)
+* Execute coercion on types (when permitted) as requested
 * type is the expected type
 */
 conNodeType * coercion(conNodeType * x, varEnum t){ //type di varEnum
@@ -206,6 +206,8 @@ conNodeType * coercion(conNodeType * x, varEnum t){ //type di varEnum
 
 /*
 * Retrives a typed value from conNodeType
+* Usefull when a certain value is found and need to access to its value 
+* With this function, we return its value (between the three possible)
 */
 float getTyped(conNodeType * x){
 	switch(x->type){
