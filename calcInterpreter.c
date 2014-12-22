@@ -23,7 +23,7 @@ conNodeType * ex(nodeType *p) {
         case nodeDic: {
 	      	//check if var already declared earlier
 	        if (getsym(p->dic.name)) { 
-	            fprintf(stderr, "%s is already declared\n", p->dic.name);
+	            fprintf(stdout, "%s is already declared\n", p->dic.name);
 	            exit(1);
 	        }
 	        //if not decleared, put in symbol table its name and type
@@ -117,7 +117,7 @@ conNodeType * ex(nodeType *p) {
                     // 46 is the maximum length of float in C
                     // I didn't figured out a smart(er) way to do this 
                     char * tmp = (char *)malloc(46 + 1);
-                    sprintf(tmp, "%f", print->r);
+                    sprintf(tmp, "%f\n", print->r);
 
                     // substitute comma with dot, again
                     for(int i = 0 ; ; i++){
@@ -177,7 +177,7 @@ conNodeType * ex(nodeType *p) {
                 case EQ: {
                     symrec * s = getsym(p->opr.op[0]->id.name);
                     if(s == NULL){
-                        fprintf(stderr, "There is not '%s' varibale in the symbol table\n", p->opr.op[0]->id.name);
+                        fprintf(stdout, "There is not '%s' varibale in the symbol table\n", p->opr.op[0]->id.name);
                         exit(1);
                     }
 

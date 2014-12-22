@@ -1,3 +1,6 @@
 /* Bortoli Gianluca 159993 */
 
 I developed points b.I, b.II, b.III, b.IV (b.VII too)
+
+I took inspiration from 5.2 example. I nearly rewrited it all to better understant
+was really going on and in order to have only what is necessary.
