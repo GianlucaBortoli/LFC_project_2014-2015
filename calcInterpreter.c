@@ -76,11 +76,11 @@ conNodeType * ex(nodeType *p) {
                     conNodeType * a;
                     //fake for with while
                 	while(ex(opr(LT, 2, p->opr.op[0], p->opr.op[2]))->b) {
+                        // body
                         ex(p->opr.op[3]);
-                        // 3:05 AM coded -_-
-                        ex(opr(EQ, 2, p->opr.op[0], 
-                            con(getTyped(a = ex(opr(PLUS, 2, p->opr.op[0], con(1,INTTYPE)))), a->type)
-                            ));
+                        // increment of one
+                        a = ex(opr(PLUS, 2, p->opr.op[0], con(1,INTTYPE)));
+                        ex(opr(EQ, 2, p->opr.op[0], con(getTyped(a), a->type)));
                     }
                     return 0;
                 }

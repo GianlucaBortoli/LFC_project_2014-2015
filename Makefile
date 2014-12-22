@@ -2,7 +2,7 @@
 
 LEX = lex
 YACC = yacc -d
-CC = clang -std=c99
+CC = cc -std=c99
 
 interpreter: y.tab.o lex.yy.o myCalc.o calcInterpreter.o
 	$(CC) -o interpreter y.tab.o lex.yy.o myCalc.o calcInterpreter.o -ll -lm
